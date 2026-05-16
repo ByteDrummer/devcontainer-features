@@ -1,12 +1,9 @@
 {
-    "color_and_hello": {
-        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "all": {
+        "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
         "features": {
-            "color": {
-                "favorite": "purple"
-            },
-            "hello": {
-                "greeting": "Greetings"
+            "neovim": {
+                "version": "nightly"
             }
         }
     }
