@@ -8,8 +8,13 @@ echo "The version to be installed is: $VERSION"
 
 # Debian / Ubuntu dependencies
 install_debian_dependencies() {
+  # Build dependencies
   apt-get update -y
   apt-get -y install ninja-build gettext cmake unzip curl build-essential
+
+  # Neovim plugin dependencies
+  apt-get install -y npm python3-pip python3-venv ripgrep fd-find
+  npm install -g tree-sitter-cli
 
   apt-get -y clean
   rm -rf /var/lib/apt/lists/*
