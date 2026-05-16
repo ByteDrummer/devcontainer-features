@@ -32,5 +32,27 @@
     "installsAfter": [
         "ghcr.io/devcontainers/features/common-utils",
         "ghcr.io/devcontainers/features/git"
+    ],
+    "mounts": [
+        {
+          "source": "${localEnv:HOME}/.config/nvim",
+          "target": "/root/.config/nvim",
+          "type": "bind"
+        },
+        {
+          "source": "nvim-share",
+          "target": "/root/.local/share/nvim",
+          "type": "volume"
+        },
+        {
+          "source": "nvim-state",
+          "target": "/root/.local/state/nvim",
+          "type": "volume"
+        },
+        {
+          "source": "nvim-cache",
+          "target": "/root/.cache/nvim",
+          "type": "volume"
+        }
     ]
 }
