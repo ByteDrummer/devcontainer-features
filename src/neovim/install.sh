@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 echo "Activating feature 'neovim'"
 
@@ -8,12 +8,9 @@ echo "The version to be installed is: $VERSION"
 
 # Debian / Ubuntu dependencies
 install_debian_dependencies() {
-  # Build dependencies
-  apt-get update -y
-  apt-get -y install ninja-build gettext cmake unzip curl build-essential
-
   # Neovim plugin dependencies
-  apt-get install -y npm python3-pip python3-venv ripgrep fd-find
+  apt-get update -y
+  apt-get install -y build-essential npm python3-pip python3-venv ripgrep fd-find
   npm install -g tree-sitter-cli
 
   apt-get -y clean
@@ -24,15 +21,12 @@ install_debian_dependencies() {
 # ** Main section **
 # ******************
 
-
 if [ "$(id -u)" -ne 0 ]; then
     echo -e 'Script must be run as root. Use sudo, su, or add "USER root" to your Dockerfile before running this script.'
     exit 1
 fi
 
 ADJUSTED_VERSION=$VERSION
-NVIM_TAG=$VERSION
-
 if [  "$VERSION" != "stable" ] && [  "$VERSION" != "nightly" ]; then
     ADJUSTED_VERSION="v$VERSION"
 fi
@@ -59,16 +53,26 @@ case "${ADJUSTED_ID}" in
         ;;
 esac
 
-echo "Downloading source for ${ADJUSTED_VERSION}..."
+ARCHITECTURE="$(dpkg --print-architecture)"
+  case "${ARCHITECTURE}" in
+    "amd64")
+      ADJUSTED_ARCHITECTURE=x86_64;
+      ;;
+    "arm64")
+      ADJUSTED_ARCHITECTURE=arm64;
+      ;;
+    *)
+      echo "Unsupported architecture: $TARGETARCH" >&2;
+      exit 1;
+      ;;
+  esac
+ASSET_PREFIX="nvim-linux-${ADJUSTED_ARCHITECTURE}"
+ASSET="${ASSET_PREFIX}.tar.gz"
+DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/${ADJUSTED_VERSION}/${ASSET}"
 
-curl -sL https://github.com/neovim/neovim/archive/refs/tags/${ADJUSTED_VERSION}.tar.gz | tar -xzC /tmp 2>&1
+echo "Downloading Neovim ${ADJUSTED_VERSION} binary for ${ADJUSTED_ARCHITECTURE}..."
 
-echo "Building..."
-
-# source directory name is one of [neovim-stable, neovim-nightly, neovim-<MAJOR>.<MINOR>.<PATCH>]
-cd /tmp/neovim-${NVIM_TAG}
-
-make CMAKE_BUILD_TYPE=Release && make CMAKE_INSTALL_PREFIX=/usr/local/nvim install
-ln -sf /usr/local/nvim/bin/nvim /usr/local/bin/nvim
-
-rm -rf /tmp/neovim-${NVIM_TAG}
+curl -LO "${DOWNLOAD_URL}"
+tar -C /opt -xzf "${ASSET}"
+rm "${ASSET}"
+ln -sf "/opt/${ASSET_PREFIX}/bin/nvim" /usr/local/bin/nvim
