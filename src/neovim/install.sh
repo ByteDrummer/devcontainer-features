@@ -1,11 +1,4 @@
 #!/bin/sh
-set -ex
-
-echo "Activating feature 'neovim'"
-
-VERSION=${VERSION:-stable}
-echo "The version to be installed is: $VERSION"
-
 # Debian / Ubuntu dependencies
 install_debian_dependencies() {
   # Neovim plugin dependencies
@@ -17,55 +10,53 @@ install_debian_dependencies() {
   rm -rf /var/lib/apt/lists/*
 }
 
-# ******************
-# ** Main section **
-# ******************
+set -ex
 
-if [ "$(id -u)" -ne 0 ]; then
-    echo -e 'Script must be run as root. Use sudo, su, or add "USER root" to your Dockerfile before running this script.'
-    exit 1
+echo "Activating feature 'neovim'"
+
+VERSION=${VERSION:-stable}
+ADJUSTED_VERSION=$VERSION
+if [ "$VERSION" != "stable" ] && [ "$VERSION" != "nightly" ]; then
+  ADJUSTED_VERSION="v$VERSION"
 fi
 
-ADJUSTED_VERSION=$VERSION
-if [  "$VERSION" != "stable" ] && [  "$VERSION" != "nightly" ]; then
-    ADJUSTED_VERSION="v$VERSION"
+echo "The version to be installed is: $VERSION"
+
+if [ "$(id -u)" -ne 0 ]; then
+  echo -e 'Script must be run as root. Use sudo, su, or add "USER root" to your Dockerfile before running this script.'
+  exit 1
 fi
 
 # Bring in ID, ID_LIKE, VERSION_ID, VERSION_CODENAME
 . /etc/os-release
 # Get an adjusted ID independent of distro variants
 if [ "${ID}" = "debian" ] || [ "${ID_LIKE}" = "debian" ]; then
-    ADJUSTED_ID="debian"
-# other distros to be implemented
-# elif [[ "${ID}" = "rhel" || "${ID}" = "fedora" || "${ID}" = "mariner" || "${ID_LIKE}" = *"rhel"* || "${ID_LIKE}" = *"fedora"* || "${ID_LIKE}" = *"mariner"* ]]; then
-  # todo
-# elif [ "${ID}" = "alpine" ]; then
-  # todo
+  ADJUSTED_ID="debian"
 else
-    echo "Linux distro ${ID} not supported."
-    exit 1
+  echo "Linux distro ${ID} not supported."
+  exit 1
 fi
 
 # Install packages for appropriate OS
 case "${ADJUSTED_ID}" in
-    "debian")
-        install_debian_dependencies
-        ;;
+"debian")
+  install_debian_dependencies
+  ;;
 esac
 
 ARCHITECTURE="$(dpkg --print-architecture)"
-  case "${ARCHITECTURE}" in
-    "amd64")
-      ADJUSTED_ARCHITECTURE=x86_64;
-      ;;
-    "arm64")
-      ADJUSTED_ARCHITECTURE=arm64;
-      ;;
-    *)
-      echo "Unsupported architecture: $TARGETARCH" >&2;
-      exit 1;
-      ;;
-  esac
+case "${ARCHITECTURE}" in
+"amd64")
+  ADJUSTED_ARCHITECTURE=x86_64
+  ;;
+"arm64")
+  ADJUSTED_ARCHITECTURE=arm64
+  ;;
+*)
+  echo "Unsupported architecture: $TARGETARCH" >&2
+  exit 1
+  ;;
+esac
 ASSET_PREFIX="nvim-linux-${ADJUSTED_ARCHITECTURE}"
 ASSET="${ASSET_PREFIX}.tar.gz"
 DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/${ADJUSTED_VERSION}/${ASSET}"
