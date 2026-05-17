@@ -1,12 +1,12 @@
 {
-    "name": "Neovim (from source)",
+    "name": "Neovim (from prebuilt binary)",
     "id": "neovim",
     "version": "1.0.0",
     "dependsOn": {
       "ghcr.io/devcontainers/features/common-utils": {},
       "ghcr.io/devcontainers/features/git": {}
     },
-    "description": "A feature to install Neovim building from source",
+    "description": "A feature to install Neovim from prebuilt binary and common plugin dependencies.",
     "options": {
         "version": {
             "type": "string",

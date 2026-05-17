@@ -1,7 +1,7 @@
 
 # Neovim (from source) (neovim)
 
-A feature to install Neovim building from source
+A feature to install Neovim from prebuilt binary and common plugin dependencies.
 
 ## Example Usage
 

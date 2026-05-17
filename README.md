@@ -2,7 +2,7 @@
 
 ## Neovim
 
-Build Neovim from source and installs
+Install Neovim from prebuilt binary and common plugin dependencies.
 
 ```jsonc
 {
