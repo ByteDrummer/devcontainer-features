@@ -1,5 +1,5 @@
 {
-    "install_neovim_bookworm": {
+    "install_nightly": {
         "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
         "features": {
             "neovim": {
@@ -7,7 +7,15 @@
             }
         }
     },
-    "install_versioned_neovim_bookworm": {
+    "install_stable": {
+        "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
+        "features": {
+            "neovim": {
+                "version": "stable"
+            }
+        }
+    },
+    "install_specific": {
         "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
         "features": {
             "neovim": {
